@@ -7,20 +7,30 @@ import java.util.List;
 public class SuffixTree {
     private List<Node> nodes = new ArrayList<>();
 
-    SuffixTree(String path) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
-        String str = reader.readLine();
-        reader.close();
-        nodes.add(new Node());
-        for (int i = 0; i < str.length(); ++i) {
-            addSuffix(str.substring(i));
+    SuffixTree(String path) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
+            String str = reader.readLine();
+            reader.close();
+            nodes.add(new Node());
+            for (int i = 0; i < str.length(); ++i) {
+                addSuffix(str.substring(i));
+            }
+            if (nodes.size() <= 1) {
+                System.err.println("Error 2: Suffix tree is empty");
+                System.exit(2);
+            }
+        } catch (IOException e) {
+            e.getMessage();
+            System.err.println("Error 3: File " + path + " not found");
+            System.exit(3);
         }
     }
 
     /**
      * @param suf current substring
-     * main function for building suffix tree
-     * function is void
+     *            main function for building suffix tree
+     *            function is void
      */
     private void addSuffix(String suf) {
         int n = 0;
@@ -68,14 +78,14 @@ public class SuffixTree {
      * @param path input file path
      * @return the desired substring with children or, if he has no children, just a substring
      */
-    public String searchSubstring(String path) throws Exception {
-        BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
-        String str = reader.readLine();
-        reader.close();
+    public String searchSubstring(String path) {
         List<String> result = new ArrayList<>();
         try {
-            if (nodes.isEmpty()) {
-                return "Suffix tree is empty";
+            BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
+            String str = reader.readLine();
+            reader.close();
+            if (nodes.size() <= 1){
+                System.exit(2);
             }
             for (Node node : nodes) {
                 if (str.equals(node.sub)) {
@@ -86,11 +96,11 @@ public class SuffixTree {
                     break;
                 }
             }
+        } catch (Exception e) {
+            e.getMessage();
+            System.exit(1);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (result.isEmpty()) throw  new Exception("Substring is not found :(");
+        if (result.isEmpty()) return "Substring is not found :(";
         else return "Result of search: " + String.valueOf(result);
     }
 
@@ -99,12 +109,16 @@ public class SuffixTree {
      */
     public String longRepSubstring() {
         String ans = "";
-        if (nodes.isEmpty()) {
-            return "Suffix tree is empty";
-        }
-        for (Node node : nodes) {
-            if (node.ch.isEmpty()) continue;
-            if (node.sub.length() >= ans.length()) ans = node.sub;
+        try {
+            if (nodes.size() <= 1){
+                System.exit(2);
+            }
+            for (Node node : nodes) {
+                if (node.ch.isEmpty()) continue;
+                if (node.sub.length() >= ans.length()) ans = node.sub;
+            }
+        } catch (Exception e) {
+            System.exit(3);
         }
         return "Longest repeated substring: " + ans;
     }
@@ -112,24 +126,26 @@ public class SuffixTree {
     /**
      * @return a file with a rendered suffix tree
      */
-    public File visualize() throws IOException {
-        if (nodes.isEmpty()) {
-            System.out.println("<empty>");
-            System.out.println("Suffix tree is empty");
-        }
+    public File visualize() {
         String path = new File("").getAbsolutePath();
         File newFile = new File(path + "\\result.txt");
-        FileOutputStream file = new FileOutputStream(newFile);
-        System.setOut(new PrintStream(file));
-        print_tree(0, "");
+        try {
+            FileOutputStream file = new FileOutputStream(newFile);
+            System.setOut(new PrintStream(file));
+            print_tree(0, "");
+
+        } catch (IOException e) {
+            e.getMessage();
+            System.exit(3);
+        }
         return newFile;
     }
 
     /**
-     * @param n num for passage through the nodes
+     * @param n   num for passage through the nodes
      * @param pre carry to another line
-     * recursive function for print suffix tree to file
-     * function is void
+     *            recursive function for print suffix tree to file
+     *            function is void
      */
     private void print_tree(int n, String pre) {
         List<Integer> children = nodes.get(n).ch;
