@@ -12,13 +12,13 @@ public class SuffixTree {
             BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
             String str = reader.readLine();
             reader.close();
+            if (str.length() <= 1) {
+                System.err.println("Error 2: Suffix tree is empty");
+                System.exit(2);
+            }
             nodes.add(new Node());
             for (int i = 0; i < str.length(); ++i) {
                 addSuffix(str.substring(i));
-            }
-            if (nodes.size() <= 1) {
-                System.err.println("Error 2: Suffix tree is empty");
-                System.exit(2);
             }
         } catch (IOException e) {
             e.getMessage();
